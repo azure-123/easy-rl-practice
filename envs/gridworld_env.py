@@ -4,7 +4,7 @@ import numpy as np
 
 # turtle tutorial : https://docs.python.org/3.3/library/turtle.html
 
-class CliffWalkingWapper(gym.Wrapper):
+class CliffWalkingWrapper(gym.Wrapper):
     def __init__(self, env):
         gym.Wrapper.__init__(self, env)
         self.t = None
