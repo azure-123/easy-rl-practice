@@ -88,6 +88,7 @@ def test(cfg,env,agent):
         ep_reward = 0  # 记录每个episode的reward
         state = env.reset()  # 重置环境, 重新开一局（即开始新的一个回合）
         while True:
+            env.render()
             action = agent.predict_actions(state)  # 根据算法选择一个动作
             next_state, reward, terminated, info = env.step(action)  # 与环境进行一个交互
             state = next_state  # 更新状态
