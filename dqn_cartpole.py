@@ -7,7 +7,7 @@ import copy
 import numpy as np
 import math
 
-env = gym.make('CartPole-v1')
+env = gym.make('CartPole-v0')
 n_states = env.observation_space.shape[0] # 获取状态数
 n_actions = env.action_space.n # 获取动作数
 print(f"状态数：{n_states}，动作数：{n_actions}")
@@ -45,7 +45,7 @@ class MLP(nn.Module):
 class DQN():
     def __init__(self, model, buffer, cfg):
         self.policy_net = model
-        self.target_net = copy.deepcopy(self.policy_net)
+        self.target_net = model
         self.epsilon = cfg.epsilon_start
         self.buffer = buffer
         self.n_actions = cfg.n_actions
@@ -110,6 +110,7 @@ class config():
         self.lr = 0.0001
         self.gamma = 0.95
         self.num_epochs = 200
+        self.test_epochs = 20
         self.update_epochs = 20
         self.timesteps = 100000
         self.epsilon_start = 0.95
@@ -117,7 +118,7 @@ class config():
         self.epsilon_decay = 500
 
 capacity = 100000
-hidden_dims = 64
+hidden_dims = 128
 cfg = config(n_actions)
 buffer = replay_buffer(capacity)
 net = MLP(n_states, n_actions, hidden_dims)
@@ -147,7 +148,7 @@ def train(cfg, env, agent):
 
 def test(cfg, env, agent):
     ep_rewards = []
-    for epoch in range(cfg.num_epochs):
+    for epoch in range(cfg.test_epochs):
         state = env.reset()
         ep_reward = 0
         for t in range(cfg.timesteps):
@@ -155,9 +156,10 @@ def test(cfg, env, agent):
             next_state, reward, done, _ = env.step(action)
             ep_reward += reward
             state = next_state
+            if done:
+                break
         ep_rewards.append(ep_reward)
-        if (epoch + 1) % 10 == 0:
-            print(f"回合：{epoch + 1}/{cfg.num_epochs}，奖励：{ep_reward:.2f}")
+        print(f"回合：{epoch + 1}/{cfg.test_epochs}，奖励：{ep_reward:.2f}")
     env.close()
 
 train(cfg, env, agent)
