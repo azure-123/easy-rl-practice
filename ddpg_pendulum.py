@@ -8,6 +8,7 @@ n_states = env.observation_space
 n_actions = env.action_space
 print(f"状态数：{n_states}，动作数：{n_actions}")
 
+# 演员网络
 class Actor(nn.Module):
     def __init__(self, input_dims, hidden_dims, output_dims, init_w=3e-3):
         super(Actor, self).__init__()
@@ -21,7 +22,8 @@ class Actor(nn.Module):
         x = F.relu(self.linear1(x))
         x = F.relu(self.linear2(x))
         return F.tanh(self.linear3(x))
-    
+
+# 评论家网络
 class Critic(nn.Module):
     def __init__(self, input_dims, hidden_dims, output_dims, init_w=3e-3):
         super(Critic, self).__init__()
@@ -36,3 +38,11 @@ class Critic(nn.Module):
         x = F.relu(self.linear1(x))
         x = F.relu(self.linear2(x))
         return self.linear3(x)
+    
+class Config():
+    def __init__(self) -> None:
+        self.epsilon_start = 0.95
+        self.epsilon_end = 0.01
+        self.train_epoch = 400
+        self.tets_epoch = 200
+        
