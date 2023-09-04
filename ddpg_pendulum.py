@@ -2,6 +2,8 @@ import torch
 import gym
 from torch import nn
 from torch.nn import functional as F
+from collections import deque
+import random
 
 env = gym.make('Pendulum-v1')
 n_states = env.observation_space
@@ -45,4 +47,23 @@ class Config():
         self.epsilon_end = 0.01
         self.train_epoch = 400
         self.tets_epoch = 200
-        
+
+class replay_buffer():
+    def __init__(self, capacity) -> None:
+        self.capacity = capacity
+        self.buffer = deque(maxlen=self.capacity)
+    def push(self, state, action, reward, next_state, done):
+        '''将与环境互动的数据加入经验回放区'''
+        self.buffer.append([state, action, reward, next_state, done])
+    def sample(self, batch_size):
+        '''从经验回放区采样数据'''
+        if len(self.buffer) < batch_size:
+            batch_size = len(self.buffer)
+        batch = random.sample(self.buffer, batch_size)
+        return zip(*batch)
+    def clear(self):
+        '''清空缓冲区'''
+        self.buffer.clear()
+    def __len__(self):
+        '''获取缓冲区长度'''
+        return len(self.buffer)
