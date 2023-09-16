@@ -151,3 +151,6 @@ def train(cfg, env, agent):
         reward.append(ep_reward)
         if (step + 1) % 20 == 0:
             print(f"回合：{step + 1}/{cfg.train_epoch}，奖励：{ep_reward:.1f}，Epsilon：{agent.epsilon:.3f}")
+
+def test(cfg, env, agent):
+    reward = []
