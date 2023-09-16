@@ -48,7 +48,7 @@ class Config():
         self.epsilon_start = 0.95
         self.epsilon_end = 0.01
         self.train_epoch = 400
-        self.tets_epoch = 200
+        self.test_epoch = 200
         self.device = 'gpu'
         self.tau = 1e-2 # 软更新参数
 
@@ -133,4 +133,21 @@ class DDPG():
         for target_param, param in zip(self.target_critic.parameters(), self.critic.paramters()):
             target_param.data.copy_(target_param.data * (1 - self.tau) + param.data * self.tau)
 
-    
+def train(cfg, env, agent):
+    reward = []
+    for step in range(cfg.traih_epoch):
+        ep_reward = 0
+        state = env.reset()
+        while True:
+            env.render()
+            action = agent.sample_action(state)
+            next_state, reward, done, _ = env.step(action)
+            ep_reward += reward
+            agent.buffer.push(state, action, reward, next_state, done)
+            agent.update()
+            state = next_state
+            if done :
+                break
+        reward.append(ep_reward)
+        if (step + 1) % 20 == 0:
+            print(f"回合：{step + 1}/{cfg.train_epoch}，奖励：{ep_reward:.1f}，Epsilon：{agent.epsilon:.3f}")
