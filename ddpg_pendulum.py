@@ -135,7 +135,7 @@ class DDPG():
 
 def train(cfg, env, agent):
     reward = []
-    for step in range(cfg.traih_epoch):
+    for step in range(cfg.train_epoch):
         ep_reward = 0
         state = env.reset()
         while True:
@@ -154,3 +154,17 @@ def train(cfg, env, agent):
 
 def test(cfg, env, agent):
     reward = []
+    for step in range(cfg.test_epoch):
+        ep_reward = 0
+        state = env.reset()
+        while True:
+            env.render()
+            action = agent.predict_action(state)
+            next_state, reward, done, _ = env.step(action)
+            ep_reward += reward
+            state = next_state
+            if done :
+                break
+        reward.append(ep_reward)
+        if (step + 1) % 20 == 0:
+            print(f"回合：{step + 1}/{cfg.train_epoch}，奖励：{ep_reward:.1f}，Epsilon：{agent.epsilon:.3f}")
